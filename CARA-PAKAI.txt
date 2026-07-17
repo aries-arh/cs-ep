@@ -1,0 +1,157 @@
+================================================================================
+  CS EP1 — Transaksi Stok
+  PANDUAN LENGKAP: dari copy folder sampai aplikasi jalan
+================================================================================
+
+Aplikasi dijalankan di 1 komputer SERVER.
+Komputer operator (KLIEN) hanya buka Chrome — tidak perlu install.
+
+
+--------------------------------------------------------------------------------
+BAGIAN 1 — DI KOMPUTER LAMA (asal / yang sudah ada aplikasinya)
+--------------------------------------------------------------------------------
+
+1. Buka folder:
+      ...\08. Transaksi CS EP1\cs-ep1-web\
+
+2. Copy SELURUH folder "cs-ep1-web"
+   - Bisa di-zip dulu, lalu copy ke USB / folder share jaringan
+   - Pastikan ikut ter-copy juga (jika ada):
+        prisma\dev.db     ← database (supaya data lama ikut pindah)
+        .env              ← pengaturan (jika ada)
+
+3. Bawa/salin hasil copy ke komputer SERVER yang baru.
+
+
+--------------------------------------------------------------------------------
+BAGIAN 2 — DI KOMPUTER SERVER (baru) — SETUP SEKALI
+--------------------------------------------------------------------------------
+
+LANGKAH A. Install Node.js (wajib, sekali saja)
+  1. Buka browser, kunjungi:  https://nodejs.org
+  2. Download versi LTS (tombol hijau kiri)
+  3. Jalankan installer
+  4. Centang opsi "Add to PATH" jika ada
+  5. Selesai install → RESTART komputer
+
+LANGKAH B. Letakkan folder aplikasi
+  1. Extract/copy folder "cs-ep1-web" ke lokasi tetap, contoh:
+        D:\apps\cs-ep1-web\
+  2. Jangan pindah-pindah folder setelah aplikasi dipakai
+
+LANGKAH C. Install aplikasi
+  1. Buka folder cs-ep1-web
+  2. Double-klik file:  INSTALL.bat
+  3. Tunggu sampai muncul tulisan:  INSTALL SELESAI
+  4. Tekan tombol apa saja untuk menutup jendela
+
+
+--------------------------------------------------------------------------------
+BAGIAN 3 — MENJALANKAN APLIKASI (setiap hari / setiap shift)
+--------------------------------------------------------------------------------
+
+Di komputer SERVER:
+
+1. Buka folder cs-ep1-web
+2. Double-klik:  START-SERVER.bat
+3. Jangan tutup jendela hitam (command prompt) itu
+4. Di jendela akan tertulis alamat akses, contoh:
+      http://localhost:3000
+      http://NAMA-KOMPUTER:3000
+5. Double-klik:  BUKA-BROWSER.bat
+   atau di Chrome ketik:  http://localhost:3000
+6. Login, contoh:
+      Admin        : admin     / admin123
+      Operator MI  : 3009999   / operator123
+      Operator AI  : ai01      / operator123
+      Operator SMT : smt01     / operator123
+
+
+--------------------------------------------------------------------------------
+BAGIAN 4 — DARI KOMPUTER KLIEN (operator lain)
+--------------------------------------------------------------------------------
+
+Tidak perlu install Node.js / copy folder aplikasi.
+
+1. Pastikan di SERVER, file START-SERVER.bat sudah jalan
+   (jendela hitam masih terbuka)
+2. Pastikan PC klien satu jaringan (LAN/Wi-Fi) dengan server
+3. Buka Chrome
+4. Ketik alamat:
+      http://NAMA-KOMPUTER-SERVER:3000
+   (ganti NAMA-KOMPUTER-SERVER sesuai nama PC server,
+    bisa dilihat di jendela START-SERVER.bat)
+5. Login dengan akun masing-masing
+
+
+--------------------------------------------------------------------------------
+BAGIAN 5 — AGAR KLIEN BISA AKSES (Firewall)
+--------------------------------------------------------------------------------
+
+Jika dari klien tidak bisa dibuka, di PC SERVER:
+
+1. Buka Windows Defender Firewall
+2. Izinkan aplikasi / buka port inbound TCP 3000
+3. Atau minta IT membuka port 3000 untuk PC server
+
+Uji dari klien:
+  ping NAMA-KOMPUTER-SERVER
+  lalu buka http://NAMA-KOMPUTER-SERVER:3000
+
+
+--------------------------------------------------------------------------------
+BAGIAN 6 — SETELAH ADA UPDATE KODE
+--------------------------------------------------------------------------------
+
+1. Ganti/copy folder cs-ep1-web yang baru (hati-hati jangan hapus
+   prisma\dev.db jika ingin data lama tetap ada)
+2. Double-klik:  BUILD.bat
+3. Lalu jalankan lagi:  START-SERVER.bat
+
+
+--------------------------------------------------------------------------------
+BAGIAN 7 — JIKA ADA ERROR
+--------------------------------------------------------------------------------
+
+  "Node.js belum terpasang"
+      → Install Node.js LTS, restart PC, jalankan INSTALL.bat lagi
+
+  "npm install gagal"
+      → Cek internet saat INSTALL.bat (butuh unduh package)
+      → Jalankan ulang INSTALL.bat
+
+  Browser localhost tidak terbuka
+      → Pastikan START-SERVER.bat masih berjalan
+      → Tunggu sampai muncul "Ready" / tidak ada error merah
+
+  Klien tidak bisa akses
+      → Cek server masih nyala + START-SERVER.bat jalan
+      → Cek satu jaringan
+      → Cek firewall port 3000
+      → Coba pakai IP server: http://192.168.x.x:3000
+
+
+--------------------------------------------------------------------------------
+DAFTAR FILE PENTING
+--------------------------------------------------------------------------------
+
+  INSTALL.bat        Setup awal di PC server (sekali)
+  START-SERVER.bat   Jalankan aplikasi (produksi) — biarkan terbuka
+  BUKA-BROWSER.bat   Buka Chrome ke aplikasi
+  BUILD.bat          Build ulang setelah update kode
+  START-DEV.bat      Hanya untuk programmer
+  CARA-PAKAI.txt     File panduan ini
+
+
+--------------------------------------------------------------------------------
+RINGKAS (HAFALAN)
+--------------------------------------------------------------------------------
+
+  1. Copy folder cs-ep1-web ke PC server
+  2. Install Node.js LTS → restart PC
+  3. Double-klik INSTALL.bat
+  4. Double-klik START-SERVER.bat (jangan ditutup)
+  5. Buka browser → login
+  6. Klien: http://NAMA-SERVER:3000
+
+================================================================================
