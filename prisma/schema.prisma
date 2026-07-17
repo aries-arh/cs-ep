@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Default: SQLite (langsung jalan tanpa MySQL).
+// Produksi: ganti provider = "mysql" + DATABASE_URL MySQL (lihat README).
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model MstLine {
+  id       Int       @id @default(autoincrement())
+  code     String    @unique
+  name     String?
+  isActive Boolean   @default(true) @map("is_active")
+  parts    MstPart[]
+  outs     TrxMiOut[]
+
+  @@map("mst_line")
+}
+
+model MstPart {
+  id           Int                  @id @default(autoincrement())
+  partNo       String               @unique @map("part_no")
+  partName     String               @map("part_name")
+  lineId       Int?                 @map("line_id")
+  isActive     Boolean              @default(true) @map("is_active")
+  line         MstLine?             @relation(fields: [lineId], references: [id])
+  stocktaking  TrxStocktakingBal[]
+  ins          TrxMiIn[]
+  outs         TrxMiOut[]
+
+  @@map("mst_part")
+}
+
+model MstUser {
+  id           Int         @id @default(autoincrement())
+  nik          String      @unique
+  name         String
+  role         String      @default("OPERATOR") // OPERATOR | LEADER | ADMIN
+  passwordHash String      @map("password_hash")
+  canAi        Boolean     @default(false) @map("can_ai")
+  canSmt       Boolean     @default(false) @map("can_smt")
+  canMi        Boolean     @default(false) @map("can_mi")
+  isActive     Boolean     @default(true) @map("is_active")
+  picIns       TrxMiIn[]   @relation("InPic")
+  createdIns   TrxMiIn[]   @relation("InCreated")
+  picOuts      TrxMiOut[]  @relation("OutPic")
+  createdOuts  TrxMiOut[]  @relation("OutCreated")
+
+  @@map("mst_user")
+}
+
+model MstLocation {
+  id       Int     @id @default(autoincrement())
+  code     String  @unique
+  name     String?
+  isActive Boolean @default(true) @map("is_active")
+
+  @@map("mst_location")
+}
+
+model TrxStocktakingBal {
+  id         Int      @id @default(autoincrement())
+  partId     Int      @map("part_id")
+  stockDate  DateTime @map("stock_date")
+  qty        Float    @default(0)
+  sourceFile String?  @map("source_file")
+  importedAt DateTime @default(now()) @map("imported_at")
+  part       MstPart  @relation(fields: [partId], references: [id])
+
+  @@unique([partId, stockDate], name: "uk_part_date")
+  @@map("trx_stocktaking_bal")
+}
+
+model TrxMiIn {
+  id         Int       @id @default(autoincrement())
+  source     String // AI | SMT | MANUAL | IMPORT
+  noSlip     String    @map("no_slip")
+  partId     Int       @map("part_id")
+  trxAt      DateTime  @map("trx_at")
+  qty        Float
+  toLocation String    @default("WC02") @map("to_location")
+  catatan    String?
+  picUserId  Int?      @map("pic_user_id")
+  createdBy  Int?      @map("created_by")
+  isVoid     Boolean   @default(false) @map("is_void")
+  part       MstPart   @relation(fields: [partId], references: [id])
+  picUser    MstUser?  @relation("InPic", fields: [picUserId], references: [id])
+  creator    MstUser?  @relation("InCreated", fields: [createdBy], references: [id])
+
+  @@unique([source, noSlip], name: "uk_source_slip")
+  @@index([partId, trxAt])
+  @@index([trxAt])
+  @@map("trx_mi_in")
+}
+
+model TrxMiOut {
+  id             Int       @id @default(autoincrement())
+  partId         Int       @map("part_id")
+  trxAt          DateTime  @map("trx_at")
+  qty            Float
+  stockSnapshot  Float?    @map("stock_snapshot")
+  lineId         Int?      @map("line_id")
+  picUserId      Int?      @map("pic_user_id")
+  createdBy      Int?      @map("created_by")
+  isVoid         Boolean   @default(false) @map("is_void")
+  voidOfId       Int?      @map("void_of_id")
+  remark         String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  part           MstPart   @relation(fields: [partId], references: [id])
+  line           MstLine?  @relation(fields: [lineId], references: [id])
+  picUser        MstUser?  @relation("OutPic", fields: [picUserId], references: [id])
+  creator        MstUser?  @relation("OutCreated", fields: [createdBy], references: [id])
+
+  @@index([partId, trxAt])
+  @@index([trxAt])
+  @@map("trx_mi_out")
+}
+
+model AppSetting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String
+
+  @@map("app_setting")
+}
